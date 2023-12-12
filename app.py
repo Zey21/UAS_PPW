@@ -66,7 +66,7 @@ def cleaning(text):
 #### UI ####
 st.header("UAS PPW")
 st.subheader("Crawling berita dari Detik.com")
-var_input = st.text_input("Masukan judul berita yang ingin dicrawling : (misal: pilpres2024)")
+var_input = st.text_input("Masukan judul berita yang ingin dicrawling : (misal: pilpres2024) proses crawling cukup lama karena mendapatkan data lebih dari 1000 halaman")
 if st.button("Crawl") == True :
     pencarian = var_input
     cari = pencarian.replace(' ','+')
