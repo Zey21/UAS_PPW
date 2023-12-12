@@ -223,3 +223,11 @@ if st.button("Crawl") == True :
         ax.text(bar.get_x() + bar.get_width()/2, height, f'{sentiment:.2f}', ha='center', va='bottom' if sentiment >= 0 else 'top', color='white' if sentiment != 0 else 'black')
     
     st.pyplot(fig)
+
+    st.subheader(Kesimpulan)
+    if sum(sentiments) > 0 :
+        st.text("Kesimpulannya berita mengenai pencarian terkait mendapatkan banyak tanggapan positif dari masyarakat")
+    elif sum(sentiments) < 0 :
+        st.text("Kesimpulannya berita mengenai pencarian terkait mendapatkan banyak tanggapan negatif dari masyarakat ")
+    else :
+        st.text("Kesimpulannya masyarakat tidak peduli")
