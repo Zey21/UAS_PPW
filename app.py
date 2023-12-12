@@ -155,3 +155,71 @@ if st.button("Crawl") == True :
     
     st.text('\nClassification Report:')
     st.text(classification_report(y, y_pred))
+
+    st.subheader("Diagram")
+    # Membuat diagram batang
+    report_dict = classification_report(y, y_pred, output_dict=True)
+    labels = list(report_dict.keys())[:-3]  # Mengambil label kelas (excludes avg/total row)
+    precision = [report_dict[label]['precision'] for label in labels]
+    recall = [report_dict[label]['recall'] for label in labels]
+    f1_score = [report_dict[label]['f1-score'] for label in labels]
+    support = [report_dict[label]['support'] for label in labels]
+    
+    fig, ax = plt.subplots(figsize=(10, 6))
+    
+    bar_width = 0.2
+    index = range(len(labels))
+    
+    bar1 = ax.bar(index, precision, bar_width, label='Precision')
+    bar2 = ax.bar([i + bar_width for i in index], recall, bar_width, label='Recall')
+    bar3 = ax.bar([i + 2 * bar_width for i in index], f1_score, bar_width, label='F1-Score')
+    
+    ax.set_xlabel('Classes')
+    ax.set_ylabel('Scores')
+    ax.set_title('Precision, Recall, and F1-Score')
+    ax.set_xticks([i + bar_width for i in index])
+    ax.set_xticklabels(labels)
+    ax.legend()
+    
+    # Menambahkan nilai support di atas setiap bar
+    for i, v in enumerate(support):
+        ax.text(i + bar_width / 2, v + 5, str(v), ha='center', va='bottom')
+    
+    plt.show()
+
+    texts = X
+
+    # Terjemahkan teks dari Bahasa Indonesia ke Bahasa Inggris
+    translator = Translator()
+    translated_texts = [translator.translate(text, src='id', dest='en').text for text in texts]
+    
+    text_list = []
+    
+    for l in range(len(X)):
+        text_list.append("text {}".format(l+1))
+    
+    # Analisis sentimen untuk setiap teks yang sudah diterjemahkan
+    sentiments = []
+    for text in translated_texts:
+        analysis = TextBlob(text)
+        sentiment = analysis.sentiment.polarity
+        sentiments.append(sentiment)
+    
+    # Menampilkan hasil analisis sentimen
+    for i, sentiment in enumerate(sentiments):
+        print(f'Translated Text {i+1}: {sentiment:.2f}')
+    
+    # Membuat diagram batang untuk sentimen
+    fig, ax = plt.subplots()
+    bars = ax.bar(range(len(translated_texts)), sentiments, color=['green' if s > 0 else 'red' if s < 0 else 'gray' for s in sentiments])
+    ax.set_xticks(range(len(translated_texts)))
+    ax.set_xticklabels(text_list, rotation=45, ha='right')
+    ax.set_ylabel('Sentiment Polarity')
+    ax.set_title('Sentiment Analysis (Translated)')
+    
+    # Menambahkan label di atas setiap bar
+    for bar, sentiment in zip(bars, sentiments):
+        height = bar.get_height()
+        ax.text(bar.get_x() + bar.get_width()/2, height, f'{sentiment:.2f}', ha='center', va='bottom' if sentiment >= 0 else 'top', color='white' if sentiment != 0 else 'black')
+    
+    plt.show()
