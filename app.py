@@ -19,6 +19,9 @@ from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from itertools import chain
 
+from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
+from tqdm.auto import tqdm
+
 import matplotlib.pyplot as plt
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
@@ -33,6 +36,34 @@ import matplotlib.pyplot as plt
 def del_word(string_awal, kata_hapus):
     string_hasil = string_awal.replace(kata_hapus, '')
     return string_hasil
+
+def cleaning(text):
+    # Menghapus tag HTML
+    text = re.compile('<.*?>|&([a-z0-9]+|#[0-9]{1,6}|#x[0-9a-f]{1,6});').sub('', str(text))
+
+    # Mengubah seluruh teks menjadi huruf kecil
+    text = text.lower()
+
+    # Menghapus spasi pada teks
+    text = text.strip()
+
+    # Menghapus Tanda Baca, karakter spesial, and spasi ganda
+    text = re.compile('<.*?>').sub('', text)
+    text = re.compile('[%s]' % re.escape(string.punctuation)).sub(' ', text)
+    text = re.sub('\s+', ' ', text)
+    text = re.sub(r'\n', ' ', text)
+    text = re.sub("â", "", text)
+
+    # Menghapus Nomor
+    text = re.sub(r'\[[0-9]*\]', ' ', text)
+    text = re.sub(r'[^\w\s]', '', str(text).lower().strip())
+    text = re.sub(r'\d', ' ', text)
+    text = re.sub(r'\s+', ' ', text)
+
+    # Mengubah text yang berisi 'nan' dengan whitespace agar nantinya dapat dihapus
+    text = re.sub('nan', '', text)
+
+    return text
 #### UI ####
 st.header("UAS PPW")
 st.subheader("Crawling berita dari Detik.com")
@@ -86,4 +117,42 @@ if st.button("Crawl") == True :
             filter_berita.append(berita_list[i])
 
     frame_berita = pd.DataFrame(filter_berita, columns =['Judul','Isi','Kategori'])
+    st.text("Output :")
     st.dataframe(frame_berita)
+
+    st.subheader("Preprocessing")
+    df = frame_berita
+    df['clean'] = df['Isi'].apply(lambda x: cleaning(x))
+    df['tokenize'] = df['clean'].apply(lambda x: word_tokenize(x))
+    stop_words = set(chain(stopwords.words('indonesian')))
+    df['remove_stopword'] = df['tokenize'].apply(lambda x: [w for w in x if not w in stop_words])
+
+    factory = StemmerFactory()
+    stemmer = factory.create_stemmer()
+    df['steming'] = df['remove_stopword'].progress_apply(lambda x: stemmer.stem(' '.join(x)).split(' '))
+    df['Isi_terbaru'] = df['steming'].apply(lambda tokens: ' '.join(tokens))
+    
+    st.dataframe(df)
+    st.subheader("Modeling")
+
+    # Misal dataframe Anda bernama df
+    X = df['Isi_terbaru'].values
+    y = df['Kategori'].values
+    
+    # Bagi data menjadi set pelatihan dan pengujian
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_state=42)
+    
+    vectorizer = TfidfVectorizer(max_features=5000, stop_words='english')
+    X_train_tfidf = vectorizer.fit_transform(X)
+    X_test_tfidf = vectorizer.transform(X)
+
+    svm_model = SVC(kernel='linear')
+    svm_model.fit(X_train_tfidf, y)
+
+    y_pred = svm_model.predict(X_test_tfidf)
+
+    accuracy = accuracy_score(y, y_pred)
+    st.text(f'Accuracy: {accuracy:.2f}')
+    
+    st.text('\nClassification Report:')
+    st.text(classification_report(y, y_pred))
