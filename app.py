@@ -185,7 +185,7 @@ if st.button("Crawl") == True :
     for i, v in enumerate(support):
         ax.text(i + bar_width / 2, v + 5, str(v), ha='center', va='bottom')
     
-    plt.show()
+    st.pyplot(fig)
 
     texts = X
 
@@ -222,4 +222,4 @@ if st.button("Crawl") == True :
         height = bar.get_height()
         ax.text(bar.get_x() + bar.get_width()/2, height, f'{sentiment:.2f}', ha='center', va='bottom' if sentiment >= 0 else 'top', color='white' if sentiment != 0 else 'black')
     
-    plt.show()
+    st.pyplot(fig)
