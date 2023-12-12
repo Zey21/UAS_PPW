@@ -66,11 +66,11 @@ def cleaning(text):
 #### UI ####
 st.header("UAS PPW")
 st.subheader("Crawling berita dari Detik.com")
-var_input = st.text_input("Masukan judul berita yang ingin dicrawling : ")
+var_input = st.text_input("Masukan judul berita yang ingin dicrawling : (misal: pilpres2024)")
 if st.button("Crawl") == True :
     pencarian = var_input
     cari = pencarian.replace(' ','+')
-    tglAwal = '11/11/2023'
+    tglAwal = '11/11/2022'
     tglAkhir = '11/12/2023'
     header={
         'user-agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36'
