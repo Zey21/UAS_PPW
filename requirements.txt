@@ -4,5 +4,6 @@ beautifulsoup4
 sastrawi
 scikit-learn
 numpy
+pandas
 matplotlib
 googletrans==4.0.0-rc1
