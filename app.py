@@ -77,7 +77,7 @@ if st.button("Crawl") == True :
     }
     berita_list = []
     
-    for halaman in range(10):
+    for halaman in range(1000):
         url = f'https://www.detik.com/search/searchall?query={cari}&sortby=time&fromdatex={tglAwal}&todatex={tglAkhir}&page={halaman}'
         
         # Mengambil data dari detik.com
