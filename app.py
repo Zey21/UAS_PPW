@@ -224,7 +224,7 @@ if st.button("Crawl") == True :
     
     st.pyplot(fig)
 
-    st.subheader(Kesimpulan)
+    st.subheader("Kesimpulan")
     if sum(sentiments) > 0 :
         st.text("Kesimpulannya berita mengenai pencarian terkait mendapatkan banyak tanggapan positif dari masyarakat")
     elif sum(sentiments) < 0 :
