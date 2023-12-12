@@ -5,7 +5,6 @@ from bs4 import BeautifulSoup
 import csv
 import pandas as pd
 import requests
-from bs4 import BeautifulSoup
 import numpy as np
 import re, string
 import nltk
